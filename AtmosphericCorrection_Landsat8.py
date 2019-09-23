@@ -171,10 +171,15 @@ def AtmosphericCorrection(BandId):
     return (xa, xb, xc)
 
 def MeanDEM(pointUL, pointDR):
+    f_path = os.path.abspath(sys.argv[0])
+
+    DEM_dirpath = os.path.split(f_path)[0]
+    #print(f_path)
     # 打开DEM数据
     try:
-        DEMIDataSet = gdal.Open("GMTED2km.tif")
+        DEMIDataSet = gdal.Open(os.path.join(DEM_dirpath,"GMTED2km.tif"))
     except Exception as e:
+        print("DEM数据读取失败!!!")
         pass
 
     DEMBand = DEMIDataSet.GetRasterBand(1)
@@ -202,7 +207,6 @@ def MeanDEM(pointUL, pointDR):
     xx = xoffset2 - xoffset1
     yy = yoffset2 - yoffset1
 
-
     # 读取研究区内的数据，并计算高程
     DEMRasterData = DEMBand.ReadAsArray(xoffset1, yoffset1, xx, yy)
 
@@ -212,14 +216,11 @@ def MeanDEM(pointUL, pointDR):
 if __name__ == '__main__':
 
     #输入数据路径
-    # RootInputPath = parse_arguments(sys.argv[1:]).Input_dir
-    # RootOutName = parse_arguments(sys.argv[2:]).Output_dir
-
-    RootInputPath = '/Users/zhaoguanhua/2018/Doucument/Paper/NDVImatch/experiment/data/20161231/LC8_130_037/'
-    RootOutName = '/Users/zhaoguanhua/2018/Doucument/Paper/NDVImatch/experiment/ac_data/'
+    RootInputPath = parse_arguments(sys.argv[1:]).Input_dir
+    RootOutName = parse_arguments(sys.argv[2:]).Output_dir
 
     #创建日志文件
-    LogFile = open(os.path.join(RootOutName,'log.text'),'w')
+    LogFile = open(os.path.join(RootOutName,'log.txt'),'w')
 
     for root,dirs,RSFiles in os.walk(RootInputPath):
 

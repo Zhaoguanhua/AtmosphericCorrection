@@ -212,10 +212,15 @@ def AtmosphericCorrection(BandId):
     return (xa, xb, xc)
 
 def MeanDEM(pointUL, pointDR):
+    f_path = os.path.abspath(sys.argv[0])
+
+    DEM_dirpath = os.path.split(f_path)[0]
+    #print(f_path)
     # 打开DEM数据
     try:
-        IDataSetDEM = gdal.Open("GMTED2km.tif")
+        IDataSetDEM = gdal.Open(os.path.join(DEM_dirpath,"GMTED2km.tif"))
     except Exception as e:
+        print("DEM数据读取失败!!!")
         pass
 
     Band = IDataSetDEM.GetRasterBand(1)
