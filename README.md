@@ -3,7 +3,7 @@
 调用py6s接口，自动读取影像头文件信息，对遥感影像进行大气校正批处理。
 ## 环境 & 依赖
 python版本3.6  
-conda install gdal
+conda install gdal  
 conda install -c conda-forge py6s
 
 
@@ -21,5 +21,5 @@ python .../AtmosphericCorrection/AtmosphericCorrection_Sentinel.py Input_dir=输
 python .../AtmosphericCorrection/AtmosphericCorrection_GF.py Input_dir=输入路径 Output_dir=输出路径
 ```
 
-##注意
+## 注意
 直接在pycharm测试可能会有bug，建议windos用户直接在conda自带的Anaconda Prompt工具中测试，mac可直接在终端里测试。
