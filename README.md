@@ -25,7 +25,7 @@ python .../AtmosphericCorrection/AtmosphericCorrection_GF.py Input_dir=输入路
 更新说明：针对标准存储格式的sentinel-2大气校正做了修改  
 1、参数使用  
 输入参数中的输入路径需要到L1C_T51TUE_A004877_20180211T025320这一级(与压缩文件同名)，这一级下的IMG_DATA文件夹存储了
-各波段影像文件，MTD_TL.xml是影像元文件
+各波段影像文件，MTD_TL.xml是影像元文件  
 <img src="https://github.com/Zhaoguanhua/AtmosphericCorrection/blob/master/img/sentinel-2_ImageTree.png" width=50%>
 <img src="https://github.com/Zhaoguanhua/AtmosphericCorrection/blob/master/img/sentinel-2_AC.png" width=50%>
 ## <font color=red>注意</font>
