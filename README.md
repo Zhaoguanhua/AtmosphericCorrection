@@ -22,6 +22,12 @@ python .../AtmosphericCorrection/AtmosphericCorrection_Lansat8.py Input_dir=输�
 python .../AtmosphericCorrection/AtmosphericCorrection_Sentinel.py Input_dir=输入路径 Output_dir=输出路径
 python .../AtmosphericCorrection/AtmosphericCorrection_GF.py Input_dir=输入路径 Output_dir=输出路径
 ```
+更新说明：针对标准存储格式的sentinel-2大气校正做了修改  
+1、参数使用  
+输入参数中的输入路径需要到L1C_T51TUE_A004877_20180211T025320这一级(与压缩文件同名)，这一级下的IMG_DATA文件夹存储了
+各波段影像文件，MTD_TL.xml是影像元文件
+e.g
+![](img/sentinel-2_ImageTree.png)![](img/sentinel-2_AC.png)
 
 ## <font color=red>注意</font>
 直接在pycharm测试可能会有bug，建议windos用户直接在conda自带的Anaconda Prompt工具中测试，mac可直接在终端里测试。

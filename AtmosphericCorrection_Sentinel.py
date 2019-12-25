@@ -16,6 +16,7 @@ import xml.dom.minidom
 import pdb
 import shutil
 from base import MeanDEM
+import argparse
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
@@ -340,8 +341,10 @@ if __name__ == '__main__':
     # file_path =r"D:\L1C_T51TUE_A004877_20180211T025320\S2B_MSIL1C_20180211T024829_N0206_R132_T51TUE_20180211T052843.SAFE\GRANULE\L1C_T51TUE_A004877_20180211T025320"
     # output_file=r"D:\result\ac_s2"
 
-    file_path=sys.argv[1]
-    output_file=sys.argv[2]
+    #输入数据路径
+    file_path = parse_arguments(sys.argv[1:]).Input_dir
+    #输出路径
+    output_file = parse_arguments(sys.argv[2:]).Output_dir
 
     MeteData = os.path.join(file_path, 'MTD_TL.xml')
     #print(MeteData)
