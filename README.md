@@ -23,7 +23,7 @@ python .../AtmosphericCorrection/AtmosphericCorrection_Sentinel.py Input_dir=输
 python .../AtmosphericCorrection/AtmosphericCorrection_GF.py Input_dir=输入路径 Output_dir=输出路径
 ```
 更新说明：针对标准存储格式的sentinel-2大气校正做了修改  
-1、文件存储结构图
+1、文件存储结构图  
 <img src="https://github.com/Zhaoguanhua/AtmosphericCorrection/blob/master/img/sentinel-2_ImageTree.png" width=50%>  
 
 2、参数使用  
