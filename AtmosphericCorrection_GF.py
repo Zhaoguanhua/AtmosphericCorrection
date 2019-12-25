@@ -16,6 +16,7 @@ import xml.dom.minidom    #读取xml格式的影像头文件
 from tqdm import tqdm     #进度条
 from Py6S import *
 import argparse
+from base import MeanDEM
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
@@ -210,49 +211,6 @@ def AtmosphericCorrection(BandId):
     xc = s.outputs.coef_xc
     # x = s.outputs.values
     return (xa, xb, xc)
-
-def MeanDEM(pointUL, pointDR):
-    f_path = os.path.abspath(sys.argv[0])
-
-    DEM_dirpath = os.path.split(f_path)[0]
-    #print(f_path)
-    # 打开DEM数据
-    try:
-        IDataSetDEM = gdal.Open(os.path.join(DEM_dirpath,"GMTED2km.tif"))
-    except Exception as e:
-        print("DEM数据读取失败!!!")
-        pass
-
-    Band = IDataSetDEM.GetRasterBand(1)
-    cols = IDataSetDEM.RasterXSize
-    rows = IDataSetDEM.RasterYSize
-
-    geotransform = IDataSetDEM.GetGeoTransform()
-    # DEM分辨率
-    pixelWidth = geotransform[1]
-    pixelHight = geotransform[5]
-
-    # DEM起始点：左上角，X：经度，Y：纬度
-    originX = geotransform[0]
-    originY = geotransform[3]
-
-    # 研究区左上角在矩阵中的位置
-    yoffset1 = int((originY - pointUL['lat']) / pixelWidth)
-    xoffset1 = int((pointUL['lon'] - originX) / (-pixelHight))
-
-    # 研究区右下角在矩阵中的位置
-    yoffset2 = int((originY - pointDR['lat']) / pixelWidth)
-    xoffset2 = int((pointDR['lon'] - originX) / (-pixelHight))
-
-    # 研究区矩阵行列数
-    xx = xoffset2 - xoffset1
-    yy = yoffset2 - yoffset1
-
-    # 读取研究区内的数据，并计算高程
-    RasterData = Band.ReadAsArray(xoffset1, yoffset1, xx, yy)
-
-    MeanAltitude = np.mean(RasterData)
-    return MeanAltitude
 
 if __name__ == '__main__':
 
