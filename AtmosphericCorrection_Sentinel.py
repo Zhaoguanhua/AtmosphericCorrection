@@ -153,7 +153,7 @@ def AtmosphericCorrection(BandId):
 
 def BasicParameters():
     '''
-    整理6s大气校正所需的参数
+    获取6s大气校正所需的参数
     '''
     global dom
     SixsParameters = dict()
@@ -162,7 +162,6 @@ def BasicParameters():
     SixsParameters["SolarZenithAngle"] = float(SunAngle[0].getElementsByTagName('ZENITH_ANGLE')[0].firstChild.data)
     SixsParameters["SolarAzimuthAngle"] = float(SunAngle[0].getElementsByTagName('AZIMUTH_ANGLE')[0].firstChild.data)
 
-    print(SixsParameters["SolarZenithAngle"])
     #卫星天顶角、方位角
     ViewAngles = dom.getElementsByTagName('Mean_Viewing_Incidence_Angle')
     ViewZeniths = dict()
@@ -192,7 +191,7 @@ def BasicParameters():
         if Resolution == '10':
             SixsParameters["Nrows"] = int(Imgsize.getElementsByTagName('NROWS')[0].firstChild.data)
             SixsParameters["Ncols"] = int(Imgsize.getElementsByTagName('NCOLS')[0].firstChild.data)
-    print(SixsParameters["Nrows"])
+
     PointBRX = PointULX + 10*SixsParameters["Ncols"]
     PointBRY = PointULY - 10*SixsParameters["Nrows"]
 
@@ -239,104 +238,176 @@ def BasicParameters():
 
     return SixsParameters
 
+def AWS_file_bk():
+    pass
+    # #输入数据路径
+    # RootInputPath = parse_arguments(sys.argv[1:]).Input_dir
+    # #输出路径
+    # RootOutName = parse_arguments(sys.argv[2:]).Output_dir
+    #
+    # #创建日志文件
+    # LogFile = open(os.path.join(RootOutName,'log.txt'),'w')
+
+    # for root,dirs,RSFiles in os.walk(RootInputPath):
+    #     #判断是否进入最底层
+    #     if len(dirs)==0:
+    #         #根据输入输出路径建立生成新文件的路径
+    #         RootInputPathList = RootInputPath.split(os.path.sep)
+    #         RootList = root.split(os.path.sep)
+    #         StartList = len(RootInputPathList)
+    #         EndList = len(RootList)
+    #         outname = RootOutName
+    #         for i in range(StartList,EndList):
+    #             if os.path.exists(os.path.join(outname,RootList[i]))==False:
+    #                 os.makedirs(os.path.join(outname,RootList[i]))
+    #                 outname=os.path.join(outname,RootList[i])
+    #             else:
+    #                 outname=os.path.join(outname,RootList[i])
+    #
+    #         #获得影像头文件
+    #         MeteData = os.path.join(root,'metadata.xml')
+    #         print(MeteData)
+    #         shutil.copyfile(MeteData,os.path.join(outname,'metedata.xml'))
+    #         dom = xml.dom.minidom.parse(MeteData)
+    #         SixsInputParameter = BasicParameters()
+    #
+    #         #选出影像所有波段
+    #         RSbands = glob.glob(os.path.join(root,"B*.tiff"))
+    #
+    #         for tifFile in RSbands:
+    #             print(tifFile)
+    #             if os.path.basename(tifFile)=="B8A.tiff":
+    #                 BandId = 9
+    #             elif int(os.path.basename(tifFile)[1:3])<9:
+    #                 BandId = int(os.path.basename(tifFile)[1:3])
+    #             else:
+    #                 BandId = int(os.path.basename(tifFile)[1:3])+1
+    #             print(BandId)
+    #             #捕捉打开数据出错异常
+    #             try:
+    #                 IDataSet = gdal.Open(tifFile)
+    #             except Exception as e:
+    #                 print("文件%S打开失败" % tifFile)
+    #                 LogFile.write('\n'+tifFile+'数据打开失败')
+    #
+    #             if IDataSet == None:
+    #                 LogFile.write('\n'+tifFile+'数据集读取为空')
+    #                 continue
+    #             else:
+    #                 #获取行列号
+    #                 cols = IDataSet.RasterXSize
+    #                 rows = IDataSet.RasterYSize
+    #                 ImgBand = IDataSet.GetRasterBand(1)
+    #                 ImgRasterData = ImgBand.ReadAsArray(0, 0, cols, rows)
+    #                 # print(ImgRasterData)
+    #                 if ImgRasterData is None:
+    #                     LogFile.write('\n'+tifFile+'栅格数据为空')
+    #                     continue
+    #                 else:
+    #                     #设置输出文件路径
+    #                     outFilename=os.path.join(outname,os.path.basename(tifFile)[0:3]+'.tiff')
+    #                     # print(outFilename)
+    #
+    #                     #如果文件存在就跳过，进行下一波段操作
+    #                     if os.path.isfile(outFilename):
+    #                         print("%s已经完成" % outFilename)
+    #                         continue
+    #                     else:
+    #                         #表观反射率转换为辐射亮度值
+    #                         RaCalRaster = TOAReflectanceToTOARadiance(BandId)
+    #                         #大气校正
+    #                         a, b, c = AtmosphericCorrection(BandId)
+    #                         y = numpy.where(RaCalRaster!=-9999,a * RaCalRaster - b,-9999)
+    #                         atc = numpy.where(y!=-9999,(y / (1 + y * c))*10000,-9999)
+    #
+    #                         driver = gdal.GetDriverByName('GTIFF')
+    #                         #输出栅格数据集
+    #                         outDataset = driver.Create(outFilename, cols, rows, 1, gdal.GDT_Int16)
+    #
+    #                         # 设置投影信息，与原数据一样
+    #                         geoTransform = IDataSet.GetGeoTransform()
+    #                         outDataset.SetGeoTransform(geoTransform)
+    #                         proj = IDataSet.GetProjection()
+    #                         outDataset.SetProjection(proj)
+    #
+    #                         outband = outDataset.GetRasterBand(1)
+    #                         outband.SetNoDataValue(-9999)
+    #                         outband.WriteArray(atc, 0, 0)
+
 if __name__ == '__main__':
 
-    #输入数据路径
-    RootInputPath = parse_arguments(sys.argv[1:]).Input_dir
-    #输出路径
-    RootOutName = parse_arguments(sys.argv[2:]).Output_dir
+    # 获得影像头文件
+    # file_path =r"D:\L1C_T51TUE_A004877_20180211T025320\S2B_MSIL1C_20180211T024829_N0206_R132_T51TUE_20180211T052843.SAFE\GRANULE\L1C_T51TUE_A004877_20180211T025320"
+    # output_file=r"D:\result\ac_s2"
 
-    #创建日志文件
-    LogFile = open(os.path.join(RootOutName,'log.txt'),'w')
+    file_path=sys.argv[1]
+    output_file=sys.argv[2]
 
-    for root,dirs,RSFiles in os.walk(RootInputPath):
-        #判断是否进入最底层
-        if len(dirs)==0:
-            #根据输入输出路径建立生成新文件的路径
-            RootInputPathList = RootInputPath.split(os.path.sep)
-            RootList = root.split(os.path.sep)
-            StartList = len(RootInputPathList)
-            EndList = len(RootList)
-            outname = RootOutName
-            for i in range(StartList,EndList):
-                if os.path.exists(os.path.join(outname,RootList[i]))==False:
-                    os.makedirs(os.path.join(outname,RootList[i]))
-                    outname=os.path.join(outname,RootList[i])
-                else:
-                    outname=os.path.join(outname,RootList[i])
+    MeteData = os.path.join(file_path, 'MTD_TL.xml')
+    #print(MeteData)
+    dom = xml.dom.minidom.parse(MeteData)
+    SixsInputParameter = BasicParameters()
 
-            #获得影像头文件 
-            MeteData = os.path.join(root,'metadata.xml')
-            print(MeteData)
-            shutil.copyfile(MeteData,os.path.join(outname,'metedata.xml'))
-            dom = xml.dom.minidom.parse(MeteData)
-            SixsInputParameter = BasicParameters()
+    # 选出影像所有波段
+    RSbands = glob.glob(os.path.join(file_path,"IMG_DATA","*B*.jp2"))
 
-            #选出影像所有波段
-            RSbands = glob.glob(os.path.join(root,"B*.tiff"))
+    for imgFile in RSbands:
+        img_basename = os.path.basename(imgFile)
+        band_id = img_basename[-6:-4]
+        if band_id == "8A":
+            BandId = 9
+        elif int(band_id) < 9:
+            BandId = int(band_id)
+        else:
+            BandId = int(band_id) + 1
+        # 捕捉打开数据出错异常
+        try:
+            IDataSet = gdal.Open(imgFile)
+        except Exception as e:
+            print("文件{file}打开失败".format(file=imgFile))
 
-            for tifFile in RSbands:
-                print(tifFile)
-                if os.path.basename(tifFile)=="B8A.tiff":
-                    BandId = 9
-                elif int(os.path.basename(tifFile)[1:3])<9:
-                    BandId = int(os.path.basename(tifFile)[1:3])
-                else:
-                    BandId = int(os.path.basename(tifFile)[1:3])+1
-                print(BandId)
-                #捕捉打开数据出错异常
-                try:
-                    IDataSet = gdal.Open(tifFile)
-                except Exception as e:
-                    print("文件%S打开失败" % tifFile)
-                    LogFile.write('\n'+tifFile+'数据打开失败')
-                
-                if IDataSet == None:
-                    LogFile.write('\n'+tifFile+'数据集读取为空')
+        if IDataSet == None:
+            print("{file}数据集读取为空".format(file=imgFile))
+            continue
+        else:
+            # 获取行列号
+            cols = IDataSet.RasterXSize
+            rows = IDataSet.RasterYSize
+            ImgBand = IDataSet.GetRasterBand(1)
+            ImgRasterData = ImgBand.ReadAsArray(0, 0, cols, rows)
+            if ImgRasterData is None:
+                print("{file}栅格数据为空".format(file=imgFile))
+                continue
+            else:
+                # 设置输出文件路径
+                outFilename = os.path.join(output_file,img_basename.replace(".jp2",".tiff"))
+
+                # 如果文件存在就跳过，进行下一波段操作
+                if os.path.isfile(outFilename):
+                    print("%s已经完成" % outFilename)
                     continue
                 else:
-                    #获取行列号
-                    cols = IDataSet.RasterXSize
-                    rows = IDataSet.RasterYSize
-                    ImgBand = IDataSet.GetRasterBand(1)
-                    ImgRasterData = ImgBand.ReadAsArray(0, 0, cols, rows)
-                    # print(ImgRasterData)
-                    if ImgRasterData is None:
-                        LogFile.write('\n'+tifFile+'栅格数据为空')
-                        continue
-                    else:
-                        #设置输出文件路径
-                        outFilename=os.path.join(outname,os.path.basename(tifFile)[0:3]+'.tiff')
-                        # print(outFilename)
 
-                        #如果文件存在就跳过，进行下一波段操作
-                        if os.path.isfile(outFilename):
-                            print("%s已经完成" % outFilename)
-                            continue
-                        else:
-                            #表观反射率转换为辐射亮度值
-                            RaCalRaster = TOAReflectanceToTOARadiance(BandId)
-                            #大气校正
-                            a, b, c = AtmosphericCorrection(BandId)
-                            y = numpy.where(RaCalRaster!=-9999,a * RaCalRaster - b,-9999)
-                            atc = numpy.where(y!=-9999,(y / (1 + y * c))*10000,-9999)
-                            
-                            driver = gdal.GetDriverByName('GTIFF')
-                            #输出栅格数据集
-                            outDataset = driver.Create(outFilename, cols, rows, 1, gdal.GDT_Int16)
+                    # 表观反射率转换为辐射亮度值
+                    RaCalRaster = TOAReflectanceToTOARadiance(BandId)
+                    # 大气校正
+                    a, b, c = AtmosphericCorrection(BandId)
+                    y = numpy.where(RaCalRaster != -9999, a * RaCalRaster - b, -9999)
+                    atc = numpy.where(y != -9999, (y / (1 + y * c)) * 10000, -9999)
+    #
+                    driver = gdal.GetDriverByName('GTIFF')
+                    # 输出栅格数据集
+                    outDataset = driver.Create(outFilename, cols, rows, 1, gdal.GDT_Int16)
 
-                            # 设置投影信息，与原数据一样
-                            geoTransform = IDataSet.GetGeoTransform()
-                            outDataset.SetGeoTransform(geoTransform)
-                            proj = IDataSet.GetProjection()
-                            outDataset.SetProjection(proj)
+                    # 设置投影信息，与原数据一样
+                    geoTransform = IDataSet.GetGeoTransform()
+                    outDataset.SetGeoTransform(geoTransform)
+                    proj = IDataSet.GetProjection()
+                    outDataset.SetProjection(proj)
 
-                            outband = outDataset.GetRasterBand(1)
-                            outband.SetNoDataValue(-9999)
-                            outband.WriteArray(atc, 0, 0)
-
-    #关闭日志文件
-    LogFile.close()
-    # print(SixsInputParameter)
+                    outband = outDataset.GetRasterBand(1)
+                    outband.SetNoDataValue(-9999)
+                    outband.WriteArray(atc, 0, 0)
+        print('{file}计算完成'.format(file=img_basename))
 
 
