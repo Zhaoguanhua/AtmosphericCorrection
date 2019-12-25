@@ -284,7 +284,7 @@ if __name__ == '__main__':
     RootOutName = parse_arguments(sys.argv[2:]).Output_dir
 
     #创建日志文件
-    LogFile = open(os.path.join(RootOutName,'log.text'),'w')
+    LogFile = open(os.path.join(RootOutName,'log.txt'),'w')
 
     for root,dirs,RSFiles in os.walk(RootInputPath):
         #判断是否进入最底层
