@@ -251,7 +251,6 @@ def BasicParameters():
     sLongitude = (ULLon+BRLon) / 2
     sLatitude = (ULLat+ULLat) / 2
 
-
     #大气模式类型
     if sLatitude > -15 and sLatitude <= 15:
         SixsParameters["AtmosphericProfile"] = 1                                    #Tropical
@@ -301,7 +300,6 @@ if __name__ == '__main__':
                     outname=os.path.join(outname,RootList[i])
                 else:
                     outname=os.path.join(outname,RootList[i])
-
 
             #获得影像头文件 
             MeteData = os.path.join(root,'metadata.xml')
