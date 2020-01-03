@@ -31,4 +31,4 @@ python .../AtmosphericCorrection/AtmosphericCorrection_GF.py Input_dir=输入路
 各波段影像文件，MTD_TL.xml是影像元文件  
 <img src="https://github.com/Zhaoguanhua/AtmosphericCorrection/blob/master/img/sentinel-2_AC.png" width=50%>
 ## <font color=red>注意</font>
-直接在pycharm测试可能会有bug，建议windos用户直接在conda自带的Anaconda Prompt工具中测试，mac可直接在终端里测试。
+直接在pycharm测试可能会有bug，建议windows用户直接在conda自带的Anaconda Prompt工具中测试，mac可直接在终端里测试。
