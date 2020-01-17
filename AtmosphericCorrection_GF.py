@@ -28,6 +28,7 @@ def parse_arguments(argv):
 
 # 解压缩原始文件
 def untar(fname, dirs):
+    print("文件路径",fname)
     try:
         t = tarfile.open(fname)
     except Exception as e:
@@ -65,36 +66,41 @@ def Block(IDataSet):
         XBlockcount = math.ceil(cols/nBlockSize)
         YBlockcount = math.ceil(rows/nBlockSize)
         print("第%d波段校正："%m)
-        with tqdm(total=XBlockcount*YBlockcount,iterable='iterable',desc = '第%i波段:'%m) as pbar:
-        # with tqdm(total=XBlockcount*YBlockcount) as pbar:
-            # print(pbar)
-            while i<rows:
-                while j <cols:
-                    #保存分块大小
-                    nXBK = nBlockSize
-                    nYBK = nBlockSize
+        try:
+            with tqdm(total=XBlockcount*YBlockcount,iterable='iterable',desc = '第%i波段:'%m) as pbar:
+            # with tqdm(total=XBlockcount*YBlockcount) as pbar:
+                # print(pbar)
+                while i<rows:
+                    while j <cols:
+                        #保存分块大小
+                        nXBK = nBlockSize
+                        nYBK = nBlockSize
 
-                    #最后不够分块的区域，有多少读取多少
-                    if i+nBlockSize>rows:
-                        nYBK = rows - i
-                    if j+nBlockSize>cols:
-                        nXBK=cols - j
+                        #最后不够分块的区域，有多少读取多少
+                        if i+nBlockSize>rows:
+                            nYBK = rows - i
+                        if j+nBlockSize>cols:
+                            nXBK=cols - j
 
-                    #分块读取影像
-                    Image = ReadBand.ReadAsArray(j,i,nXBK,nYBK)
+                        #分块读取影像
+                        Image = ReadBand.ReadAsArray(j,i,nXBK,nYBK)
 
-                    outImage =np.where(Image>0,Image*Gain + Bias,-9999)
+                        outImage =np.where(Image>0,Image*Gain + Bias,-9999)
 
-                    y = np.where(outImage!=-9999,AtcCofa * outImage - AtcCofb,-9999)
-                    atcImage = np.where(y!=-9999,(y / (1 + y * AtcCofc))*10000,-9999)
+                        y = np.where(outImage!=-9999,AtcCofa * outImage - AtcCofb,-9999)
+                        atcImage = np.where(y!=-9999,(y / (1 + y * AtcCofc))*10000,-9999)
 
-                    outband.WriteArray(atcImage,j,i)
+                        outband.WriteArray(atcImage,j,i)
 
-                    j=j+nXBK
-                    time.sleep(1)
-                    pbar.update(1)
-                j=0
-                i=i+nYBK
+                        j=j+nXBK
+                        time.sleep(1)
+                        pbar.update(1)
+                    j=0
+                    i=i+nYBK
+        except KeyboardInterrupt:
+            pbar.close()
+            raise
+        pbar.close()
 
 def RadiometricCalibration(BandId):
     global cols,rows,SatelliteID,SensorID,Year,ImageType,config
@@ -118,7 +124,7 @@ def AtmosphericCorrection(BandId):
 
     # 传感器类型 自定义
     s.geometry = Geometry.User()
-    s.geometry.solar_z = float(dom.getElementsByTagName('SolarZenith')[0].firstChild.data)
+    s.geometry.solar_z = 90-float(dom.getElementsByTagName('SolarZenith')[0].firstChild.data)
     s.geometry.solar_a = float(dom.getElementsByTagName('SolarAzimuth')[0].firstChild.data)
     # s.geometry.view_z = float(dom.getElementsByTagName('SatelliteZenith')[0].firstChild.data)
     # s.geometry.view_a = float(dom.getElementsByTagName('SatelliteAzimuth')[0].firstChild.data)
@@ -225,6 +231,7 @@ if __name__ == '__main__':
         pass
 
     for tarFile in tarFiles:
+        print(tarFile)
         filename = os.path.basename(tarFile)
         fileType = filename[0:2]
         if fileType == 'GF':
@@ -239,7 +246,7 @@ if __name__ == '__main__':
                 try:
                     untar(intputname,outname)
                 except Exception as e:
-                    pass
+                    continue
                 tiffFile = glob.glob(outname + "/*.tiff")[0]
                 metedata = glob.glob(outname+"/*.xml")[0]
 
@@ -261,7 +268,7 @@ if __name__ == '__main__':
             try:
                 IDataSet = gdal.Open(tiffFile)
             except Exception as e:
-                print("文件%S打开失败" % tifFile)
+                print("文件%S打开失败" % tiffFile)
 
             cols = IDataSet.RasterXSize
             rows = IDataSet.RasterYSize
