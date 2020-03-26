@@ -234,8 +234,10 @@ if __name__ == '__main__':
         print(tarFile)
         filename = os.path.basename(tarFile)
         fileType = filename[0:2]
+        filename_split = filename.split("_")
         if fileType == 'GF':
-            GFType = filename[4:7]
+            #GFType = filename[4:7]
+            GFType = filename_split[1]
             intputname = os.path.join(InputFilePath,filename)
             outFileName = filename[:-7]
             outname = os.path.join(InputFilePath,outFileName)
@@ -273,9 +275,12 @@ if __name__ == '__main__':
             cols = IDataSet.RasterXSize
             rows = IDataSet.RasterYSize
 
-            SatelliteID = filename[0:3]
-            SensorID = filename[4:8]
-            Year = filename[22:26]
+            # SatelliteID = filename[0:3]
+            # SensorID = filename[4:8]
+            # Year = filename[22:26]
+            SatelliteID = filename_split[0]
+            SensorID = filename_split[1]
+            Year = filename_split[4][:4]
             ImageType =os.path.basename(tiffFile)[-9:-6]
 
             Block(IDataSet)
