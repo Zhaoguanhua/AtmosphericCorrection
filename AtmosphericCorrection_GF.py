@@ -237,29 +237,26 @@ if __name__ == '__main__':
         filename_split = filename.split("_")
         if fileType == 'GF':
             #GFType = filename[4:7]
-            GFType = filename_split[1]
+            GFType = filename_split[1][:3]
             intputname = os.path.join(InputFilePath,filename)
             outFileName = filename[:-7]
             outname = os.path.join(InputFilePath,outFileName)
             atcfiles = os.path.join(OutputFilePath,outFileName)
 
             print("文件"+filename+"开始解压缩")
+
+            try:
+                untar(intputname, outname)
+            except Exception as e:
+                continue
+
             if GFType == 'WFV':
-                try:
-                    untar(intputname,outname)
-                except Exception as e:
-                    continue
                 tiffFile = glob.glob(outname + "/*.tiff")[0]
                 metedata = glob.glob(outname+"/*.xml")[0]
 
             elif GFType == 'PMS':
-                try:
-                    untar(intputname, outname)
-                except Exception as e:
-                    pass
-
-                tiffFile = glob.glob(outname + "/*MSS*.tiff")[0]
-                metedata = glob.glob(outname+"/*MSS*.xml")[0]
+                tiffFile = glob.glob(outname + "/*mss*.tiff")[0]
+                metedata = glob.glob(outname+"/*mss*.xml")[0]
 
             try:
                 os.mkdir(atcfiles)
