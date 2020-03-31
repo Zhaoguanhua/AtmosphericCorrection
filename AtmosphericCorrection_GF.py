@@ -219,9 +219,10 @@ def AtmosphericCorrection(BandId):
     return (xa, xb, xc)
 
 if __name__ == '__main__':
-
+    script_path = os.path.split(os.path.realpath(__file__))[0]
     #读取辐射校正和大气校正所需参数:增益、偏移和光谱响应函数
-    config = json.load(open("RadiometricCorrectionParameter.json"))
+    config_file = os.path.join(script_path,"RadiometricCorrectionParameter.json")
+    config = json.load(open(config_file))
 
     #输入数据路径
     InputFilePath = parse_arguments(sys.argv[1:]).Input_dir
@@ -251,12 +252,16 @@ if __name__ == '__main__':
                 continue
 
             if GFType == 'WFV':
-                tiffFile = glob.glob(outname + "/*.tiff")[0]
-                metedata = glob.glob(outname+"/*.xml")[0]
+                # tiffFile = glob.glob(outname + "/*.tiff")[0]
+                # metedata = glob.glob(outname+"/*.xml")[0]
+                tiffFile = glob.glob(os.path.join(outname,"*.tiff"))[0]
+                metedata = glob.glob(os.path.join(outname,"*.xml"))[0]
 
             elif GFType == 'PMS':
-                tiffFile = glob.glob(outname + "/*mss*.tiff")[0]
-                metedata = glob.glob(outname+"/*mss*.xml")[0]
+                # tiffFile = glob.glob(outname + "/*mss*.tiff")[0]
+                # metedata = glob.glob(outname+"/*mss*.xml")[0]
+                tiffFile = glob.glob(os.path.join(outname,"*MSS*.tiff"))[0]
+                metedata = glob.glob(os.path.join(outname,"*MSS*.xml"))[0]
 
             try:
                 os.mkdir(atcfiles)

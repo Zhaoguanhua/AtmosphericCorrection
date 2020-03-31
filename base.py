@@ -8,6 +8,7 @@
 @Software: PyCharm
 """
 
+import os
 import gdal
 import numpy as np
 
@@ -15,8 +16,11 @@ def MeanDEM(pointUL, pointDR):
     '''
     计算影像所在区域的平均高程.
     '''
+    script_path = os.path.split(os.path.realpath(__file__))[0]
+    dem_path = os.path.join(script_path,"GMTED2km.tif")
+
     try:
-        DEMIDataSet = gdal.Open("GMTED2km.tif")
+        DEMIDataSet = gdal.Open(dem_path)
     except Exception as e:
         pass
 
