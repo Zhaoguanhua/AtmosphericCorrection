@@ -45,7 +45,6 @@ def MeanDEM(pointUL, pointDR):
     # 研究区矩阵行列数
     xx = xoffset2 - xoffset1
     yy = yoffset2 - yoffset1
-
     # 读取研究区内的数据，并计算高程
     DEMRasterData = DEMBand.ReadAsArray(xoffset1, yoffset1, xx, yy)
 

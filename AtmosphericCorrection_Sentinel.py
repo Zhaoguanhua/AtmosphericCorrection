@@ -207,10 +207,10 @@ def BasicParameters():
     ct = osr.CoordinateTransformation(source,target)
     CoordsUL,CoordsBR = ct.TransformPoints([(PointULX,PointULY),(PointBRX,PointBRY)])
 
-    ULLon = CoordsUL[0]
-    ULLat = CoordsUL[1]
-    BRLon = CoordsBR[0]
-    BRLat = CoordsBR[1]
+    ULLat = CoordsUL[0]
+    ULLon = CoordsUL[1]
+    BRLat = CoordsBR[0]
+    BRLon = CoordsBR[1]
 
     sLongitude = (ULLon+BRLon) / 2
     sLatitude = (ULLat+ULLat) / 2
@@ -337,9 +337,9 @@ def AWS_file_bk():
 
 if __name__ == '__main__':
 
-    # 获得影像头文件
-    # file_path =r"D:\L1C_T51TUE_A004877_20180211T025320\S2B_MSIL1C_20180211T024829_N0206_R132_T51TUE_20180211T052843.SAFE\GRANULE\L1C_T51TUE_A004877_20180211T025320"
-    # output_file=r"D:\result\ac_s2"
+    #获得影像头文件
+    # file_path =r"D:\test\L1C_T51TUE_A004877_20180211T025320"
+    #     # output_file=r"D:\test\ac_s2"
 
     #输入数据路径
     file_path = parse_arguments(sys.argv[1:]).Input_dir
