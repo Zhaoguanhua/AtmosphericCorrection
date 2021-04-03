@@ -35,8 +35,18 @@ def untar(fname, dirs):
         print("文件%s打开失败" % fname)
     t.extractall(path=dirs)
 
-def Block(IDataSet):
-    global cols,rows,atcfiles
+def Block(IDataSet,filename_split,atcfiles,ImageType,config,metedata,outFileName):
+    print("**************************************************************")
+    print(metedata)
+    # global cols,rows,atcfiles
+    cols = IDataSet.RasterXSize
+    rows = IDataSet.RasterYSize
+    print(cols,rows)
+    print(filename_split)
+    SatelliteID = filename_split[0]
+    SensorID = filename_split[1]
+    Year = filename_split[4][:4]
+
     #设置输出波段
     Driver = IDataSet.GetDriver()
     geoTransform1 = IDataSet.GetGeoTransform()
@@ -44,21 +54,26 @@ def Block(IDataSet):
     ListgeoTransform1[5] = -ListgeoTransform1[5]
     newgeoTransform1 = tuple(ListgeoTransform1)
     proj1 = IDataSet.GetProjection()
-    OutRCname = os.path.join(atcfiles,outFileName+".tif")
+    print(proj1)
+    OutRCname = os.path.join(atcfiles,outFileName+".tiff")
+    print(OutRCname)
     outDataset = Driver.Create(OutRCname,cols,rows,4,gdal.GDT_Int32)
     outDataset.SetGeoTransform(newgeoTransform1)
     outDataset.SetProjection(proj1)
     #分别读取4个波段
+    print("sdfssdffsfsfs")
     for m in range(1,5):
+        print(m)
         ReadBand = IDataSet.GetRasterBand(m)
         outband = outDataset.GetRasterBand(m)
         outband.SetNoDataValue(-9999)
         #获取对应波段的增益gain和偏移bias
-        Gain,Bias = RadiometricCalibration(m)
+        Gain,Bias = RadiometricCalibration(m,SatelliteID,SensorID,Year,ImageType,config)
+        print(Gain,Bias)
 
         #获取大气校正系数
-        AtcCofa, AtcCofb, AtcCofc = AtmosphericCorrection(m)
-        nBlockSize = 1024
+        AtcCofa, AtcCofb, AtcCofc = AtmosphericCorrection(m,metedata,config,SatelliteID,SensorID)
+        nBlockSize = 512
         i = 0
         j = 0
         b = cols*rows
@@ -102,8 +117,8 @@ def Block(IDataSet):
             raise
         pbar.close()
 
-def RadiometricCalibration(BandId):
-    global cols,rows,SatelliteID,SensorID,Year,ImageType,config
+def RadiometricCalibration(BandId,SatelliteID,SensorID,Year,ImageType,config):
+    # global cols,rows,SatelliteID,SensorID,Year,ImageType,config
     if SensorID[0:3] == "WFV":
         Gain_ =config["Parameter"][SatelliteID][SensorID][Year]["gain"][BandId-1]
         Bias_ =config["Parameter"][SatelliteID][SensorID][Year]["offset"][BandId-1]
@@ -114,8 +129,8 @@ def RadiometricCalibration(BandId):
     return Gain_,Bias_
 
 # 6s大气校正
-def AtmosphericCorrection(BandId):
-    global metedata,config,SatelliteID,SensorID
+def AtmosphericCorrection(BandId,metedata,config,SatelliteID,SensorID):
+    # global metedata,config,SatelliteID,SensorID
     #读取头文件
     dom = xml.dom.minidom.parse(metedata)
 
@@ -274,16 +289,14 @@ if __name__ == '__main__':
             except Exception as e:
                 print("文件%S打开失败" % tiffFile)
 
-            cols = IDataSet.RasterXSize
-            rows = IDataSet.RasterYSize
+            # cols = IDataSet.RasterXSize
+            # rows = IDataSet.RasterYSize
 
-            # SatelliteID = filename[0:3]
-            # SensorID = filename[4:8]
-            # Year = filename[22:26]
-            SatelliteID = filename_split[0]
-            SensorID = filename_split[1]
-            Year = filename_split[4][:4]
+
+            # SatelliteID = filename_split[0]
+            # SensorID = filename_split[1]
+            # Year = filename_split[4][:4]
             ImageType =os.path.basename(tiffFile)[-9:-6]
 
-            Block(IDataSet)
+            Block(IDataSet,filename_split,atcfiles,ImageType,config,metedata,outFileName)
 
