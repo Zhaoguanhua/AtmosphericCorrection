@@ -17,6 +17,7 @@ from tqdm import tqdm     #进度条
 from Py6S import *
 import argparse
 from base import MeanDEM
+import shutil
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
@@ -269,18 +270,29 @@ if __name__ == '__main__':
                 # metedata = glob.glob(outname+"/*.xml")[0]
                 tiffFile = glob.glob(os.path.join(outname,"*.tiff"))[0]
                 metedata = glob.glob(os.path.join(outname,"*.xml"))[0]
+                rpb_file = glob.glob(os.path.join(outname,"*.rpb"))[0]
 
             elif GFType == 'PMS':
                 # tiffFile = glob.glob(outname + "/*mss*.tiff")[0]
                 # metedata = glob.glob(outname+"/*mss*.xml")[0]
                 tiffFile = glob.glob(os.path.join(outname,"*MSS*.tiff"))[0]
                 metedata = glob.glob(os.path.join(outname,"*MSS*.xml"))[0]
+                rpb_file = glob.glob(os.path.join(outname, "*MSS*.rpb"))[0]
 
             try:
                 os.mkdir(atcfiles)
             except Exception as e:
                 pass
             print(filename+"解压缩完成")
+
+            #将头文件和几何校正文件拷贝到大气校正结果文件中
+            metedata_basename = os.path.basename(metedata)
+            copy_metedata = os.path.join(atcfiles,metedata_basename)
+            shutil.copy(metedata,copy_metedata)
+
+            rpb_basename=os.path.basename(rpb_file)
+            copy_rpb_file = os.path.join(atcfiles,rpb_basename)
+            shutil.copy(rpb_file,copy_rpb_file)
 
             try:
                 IDataSet = gdal.Open(tiffFile)
