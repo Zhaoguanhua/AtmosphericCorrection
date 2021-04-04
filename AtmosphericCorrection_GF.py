@@ -36,13 +36,10 @@ def untar(fname, dirs):
     t.extractall(path=dirs)
 
 def Block(IDataSet,filename_split,atcfiles,ImageType,config,metedata,outFileName):
-    print("**************************************************************")
-    print(metedata)
     # global cols,rows,atcfiles
     cols = IDataSet.RasterXSize
     rows = IDataSet.RasterYSize
-    print(cols,rows)
-    print(filename_split)
+
     SatelliteID = filename_split[0]
     SensorID = filename_split[1]
     Year = filename_split[4][:4]
@@ -54,26 +51,26 @@ def Block(IDataSet,filename_split,atcfiles,ImageType,config,metedata,outFileName
     ListgeoTransform1[5] = -ListgeoTransform1[5]
     newgeoTransform1 = tuple(ListgeoTransform1)
     proj1 = IDataSet.GetProjection()
-    print(proj1)
+
     OutRCname = os.path.join(atcfiles,outFileName+".tiff")
-    print(OutRCname)
+
     outDataset = Driver.Create(OutRCname,cols,rows,4,gdal.GDT_Int32)
     outDataset.SetGeoTransform(newgeoTransform1)
     outDataset.SetProjection(proj1)
     #分别读取4个波段
-    print("sdfssdffsfsfs")
+
     for m in range(1,5):
-        print(m)
+
         ReadBand = IDataSet.GetRasterBand(m)
         outband = outDataset.GetRasterBand(m)
         outband.SetNoDataValue(-9999)
         #获取对应波段的增益gain和偏移bias
         Gain,Bias = RadiometricCalibration(m,SatelliteID,SensorID,Year,ImageType,config)
-        print(Gain,Bias)
+
 
         #获取大气校正系数
         AtcCofa, AtcCofb, AtcCofc = AtmosphericCorrection(m,metedata,config,SatelliteID,SensorID)
-        nBlockSize = 512
+        nBlockSize = 2048
         i = 0
         j = 0
         b = cols*rows
@@ -82,7 +79,7 @@ def Block(IDataSet,filename_split,atcfiles,ImageType,config,metedata,outFileName
         YBlockcount = math.ceil(rows/nBlockSize)
         print("第%d波段校正："%m)
         try:
-            with tqdm(total=XBlockcount*YBlockcount,iterable='iterable',desc = '第%i波段:'%m) as pbar:
+            with tqdm(total=XBlockcount*YBlockcount,iterable='iterable',desc = '第%i波段:'%m,mininterval=10) as pbar:
             # with tqdm(total=XBlockcount*YBlockcount) as pbar:
                 # print(pbar)
                 while i<rows:
@@ -234,6 +231,7 @@ def AtmosphericCorrection(BandId,metedata,config,SatelliteID,SensorID):
     return (xa, xb, xc)
 
 if __name__ == '__main__':
+    a=time.time()
     script_path = os.path.split(os.path.realpath(__file__))[0]
     #读取辐射校正和大气校正所需参数:增益、偏移和光谱响应函数
     config_file = os.path.join(script_path,"RadiometricCorrectionParameter.json")
@@ -289,14 +287,9 @@ if __name__ == '__main__':
             except Exception as e:
                 print("文件%S打开失败" % tiffFile)
 
-            # cols = IDataSet.RasterXSize
-            # rows = IDataSet.RasterYSize
-
-
-            # SatelliteID = filename_split[0]
-            # SensorID = filename_split[1]
-            # Year = filename_split[4][:4]
             ImageType =os.path.basename(tiffFile)[-9:-6]
 
             Block(IDataSet,filename_split,atcfiles,ImageType,config,metedata,outFileName)
 
+    b=time.time()
+    print("总时间:",b-a)

@@ -15,7 +15,7 @@ from osgeo import gdal
 import pdb
 import shutil
 import argparse
-from base import MeanDEM
+from .base import MeanDEM
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()

@@ -57,7 +57,7 @@ def atmospheric_correction(file_path,input_dir,output_dir,config):
 
     try:
         IDataSet = gdal.Open(tiffFile)
-        print(IDataSet)
+        # print(IDataSet)
     except Exception as e:
         print("文件%S打开失败" % tiffFile)
 
@@ -69,7 +69,7 @@ def atmospheric_correction(file_path,input_dir,output_dir,config):
 
 if __name__ == '__main__':
     print('Parent process {}'.format(os.getpid()))
-
+    a=time.time()
     script_path = os.path.split(os.path.realpath(__file__))[0]
     #读取辐射校正和大气校正所需参数:增益、偏移和光谱响应函数
     config_file = os.path.join(script_path,"RadiometricCorrectionParameter.json")
@@ -80,10 +80,10 @@ if __name__ == '__main__':
 
     #获取影像列表
     GF_files= glob.glob(os.path.join(input_dir,"*.tar.gz"))
-    print(GF_files)
+    # print(GF_files)
 
     #进程池
-    p=Pool(2)
+    p=Pool(3)
     for gf_file_path in GF_files:
         p.apply_async(atmospheric_correction,args=(gf_file_path,input_dir,output_dir,config,))
 
@@ -92,3 +92,5 @@ if __name__ == '__main__':
     p.close()
     p.join()
     print("All subprocesses done")
+    b=time.time()
+    print("总时间:",b-a)
