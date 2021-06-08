@@ -207,13 +207,14 @@ def BasicParameters():
     ct = osr.CoordinateTransformation(source,target)
     CoordsUL,CoordsBR = ct.TransformPoints([(PointULX,PointULY),(PointBRX,PointBRY)])
 
+
     ULLat = CoordsUL[0]
     ULLon = CoordsUL[1]
     BRLat = CoordsBR[0]
     BRLon = CoordsBR[1]
 
     sLongitude = (ULLon+BRLon) / 2
-    sLatitude = (ULLat+ULLat) / 2
+    sLatitude = (ULLat+BRLat) / 2
 
     #大气模式类型
     if sLatitude > -15 and sLatitude <= 15:
